@@ -21,7 +21,7 @@ def train_vit_model(train_dir, val_dir, val_label_csv_path, weights_save_path, b
                         save_best_only=True, monitor="val_loss")
     reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-5)
     es = EarlyStopping(monitor="val_loss", patience=5)
-    model.fit(train_gen, validation_data=val_gen, epochs=10000, callbacks=[cp, es, reduce_lr])
+    model.fit(train_gen, validation_data=val_gen, epochs=100, callbacks=[cp, es, reduce_lr])
 
 
 if __name__ == "__main__":
