@@ -5,15 +5,17 @@ import numpy as np
 from processing import preprocess, postprocess
 from loguru import logger
 import argparse
+import logging
 
 os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+
+logger = logging.getLogger(__name__)
 
 class Inference:
     def __init__(self, load_model_name=None):
         logger.info("Loading Models")
         self.vit_model = load_vit_model()
 
-    
     def predict(self, model_name, image_path, postprocess_and_save=True):
         X = preprocess(model_name, image_path)
         
@@ -21,9 +23,10 @@ class Inference:
         
         logger.info(f"Predicted angle is: {y} degree")
         pred_angle = -y
+        processed_image = None
         if postprocess_and_save:
-            postprocess(image_path, pred_angle, 400)
-        return y
+            processed_image = postprocess(image_path, pred_angle, 400)
+        return y, processed_image
 
         
         

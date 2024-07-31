@@ -35,7 +35,7 @@ class ViTRotGenerator(Sequence):
         for i, f in enumerate(batch_files):
             try:
                 angle = float(np.random.choice(range(0, 360)))
-                img = rotate_preserve_size(f, angle, (self.dim, self.dim))
+                img = rotate_preserve_size(f, angle, (self.dim, self.dim), fill_color=(255, 255, 255))
                 img = np.array(img)
                 X_vit.append(img)
 
@@ -43,7 +43,8 @@ class ViTRotGenerator(Sequence):
                 X_conv.append(img)
                 y.append(angle)
 
-            except:
+            except Exception as e:
+                print(f"Error processing file {f}: {e}")
                 pass
         
         X_vit = feature_extractor(images=X_vit, return_tensors="pt")["pixel_values"]
@@ -55,6 +56,7 @@ class ViTRotGenerator(Sequence):
     
     def on_epoch_end(self):
         random.shuffle(self.files)
+
 
 
 class ViTValidationTestGenerator(Sequence):

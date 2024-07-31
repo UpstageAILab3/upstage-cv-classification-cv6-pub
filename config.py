@@ -3,7 +3,7 @@ import os
 ROOT_DIR = os.getcwd()
 VIT_WEIGHTS_PATH = "weights/model-vit-ang-loss.h5"
 
-SAVE_IMAGE_DIR = os.path.join("/tmp/")
+SAVE_IMAGE_DIR = os.path.join(ROOT_DIR, "preds2")
 
 COCO_TRAIN_DIR = "data/train/"
 COCO_VALIDATION_DIR = "data/validation-test"

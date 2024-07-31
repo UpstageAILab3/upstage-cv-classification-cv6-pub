@@ -3,15 +3,17 @@ import numpy as np
 import math
 from PIL import Image
 
-def rotate_image(image, angle):
+import cv2
+import numpy as np
+
+def rotate_image(image, angle, fill_color=(0, 0, 0)):
     """
-    Rotates an OpenCV 2 / NumPy image about it's centre by the given angle
+    Rotates an OpenCV 2 / NumPy image about its centre by the given angle
     (in degrees). The returned image will be large enough to hold the entire
-    new image, with a black background
+    new image, with the specified background color.
     """
 
     # Get the image size
-    # No that's not an error - NumPy stores image matricies backwards
     image_size = (image.shape[1], image.shape[0])
     image_center = tuple(np.array(image_size) / 2)
 
@@ -22,7 +24,7 @@ def rotate_image(image, angle):
 
     rot_mat_notranslate = np.matrix(rot_mat[0:2, 0:2])
 
-    # Shorthand for below calcs
+    # Shorthand for below calculations
     image_w2 = image_size[0] * 0.5
     image_h2 = image_size[1] * 0.5
 
@@ -51,14 +53,14 @@ def rotate_image(image, angle):
     new_w = int(abs(right_bound - left_bound))
     new_h = int(abs(top_bound - bot_bound))
 
-    # We require a translation matrix to keep the image centred
+    # We require a translation matrix to keep the image centered
     trans_mat = np.matrix([
         [1, 0, int(new_w * 0.5 - image_w2)],
         [0, 1, int(new_h * 0.5 - image_h2)],
         [0, 0, 1]
     ])
 
-    # Compute the tranform for the combined rotation and translation
+    # Compute the transform for the combined rotation and translation
     affine_mat = (np.matrix(trans_mat) * np.matrix(rot_mat))[0:2, :]
 
     # Apply the transform
@@ -66,10 +68,13 @@ def rotate_image(image, angle):
         image,
         affine_mat,
         (new_w, new_h),
-        flags=cv2.INTER_LINEAR
+        flags=cv2.INTER_LINEAR,
+        borderValue=fill_color
     )
 
     return result
+
+
 
 
 def largest_rotated_rect(w, h, angle):
@@ -134,15 +139,21 @@ def crop_around_center(image, width, height, crop):
 width = 500
 height = 500
 dsize = (width, height)
-def rotate_preserve_size(image, angle, dsize=dsize, crop=True):
-    image = cv2.imread(image)
+
+
+def rotate_preserve_size(image_path, angle, dsize=(224, 224), crop=True, fill_color=(255, 255, 255)):
+    """
+    Rotates an image and preserves its size, filling the background with the specified color.
+    """
+    image = cv2.imread(image_path)
     image_height, image_width = image.shape[0:2]
     image_orig = np.copy(image)
-    image_rotated = rotate_image(image, angle)
+    image_rotated = rotate_image(image, angle, fill_color=fill_color)  # Use specified fill color
+
     width, height = largest_rotated_rect(image_width, image_height, math.radians(angle))
     image_rotated_cropped = crop_around_center(image_rotated, width, height, crop=crop)
     image_rotated_cropped = cv2.cvtColor(image_rotated_cropped, cv2.COLOR_BGR2RGB)
+
     final_image = Image.fromarray(image_rotated_cropped)
-    #Using the PIL libaray converting the numpy array to comaptible image
     final_image = final_image.resize(size=dsize)
     return final_image

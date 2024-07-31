@@ -39,18 +39,21 @@ def preprocess(model_name, image_path):
     return X
     
 
-
-
-def postprocess(img_path, angle, image_size):
-    img = rotate_preserve_size(img_path, angle, (image_size, image_size), False)
-
-    # filename = "cs776a-pred.jpg" #img_path.split("/")[-1]
-    filename = "pred_" + img_path.split("/")[-1]
-
-    try:
-        img.save(os.path.join(SAVE_IMAGE_DIR, filename))
-        logger.info(f"Image after orientation angle correction has been saved here: /tmp/{filename}")
-    except:
-        filename = str(datetime.datetime.now()) + "_" + filename
-        img.save(os.path.join(SAVE_IMAGE_DIR, filename))
-        logger.info(f"Image after orientation angle correction has been saved here: /tmp/{filename}")
+def postprocess(image_path, angle, size):
+    # Load the image
+    
+    image = rotate_preserve_size(image_path, angle, (size, size), False)
+    
+    # Rotate the image by the predicted angle
+    processed_image = image.rotate(angle, expand=True, fillcolor=(255, 255, 255))
+    
+    
+    # Extract the filename and create the output path with a suffix indicating processed status
+    base_name, ext = os.path.splitext(os.path.basename(image_path))
+    filename = f"{base_name}_processed{ext}"
+    output_path = os.path.join(SAVE_IMAGE_DIR, filename)
+    
+    # Save the processed image
+    processed_image.save(output_path)
+    
+    return processed_image
