@@ -84,4 +84,9 @@ $RECYCLE.BIN/
 # Dataset
 data.tar.gz
 data/
-JYL/Example
+JYL/examples/
+JYL/experiments/
+JYL/augraphy_cache/
+JYL/fonts/
+JYL/[Image Classification] 베이스라인 코드 해설.ipynb
+JYL/[Image Classification] 베이스라인 코드_JYL.ipynb
